@@ -19,6 +19,7 @@
 #   (백엔드 저장소와 같은 값이어도 저장소마다 따로 등록해야 함)
 #
 # 실행 결과 확인: GitHub 저장소의 Actions 탭
+#                docker hub repositories 페이지
 # ==========================================================
 
 # 워크플로 이름 (Actions 탭 목록에 표시)
@@ -30,17 +31,17 @@ name: React CI with Docker
 on:
   # main 브랜치에 커밋이 push 될 때 (PR 이 병합될 때도 실행됨)
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   # main 으로 병합하려는 Pull Request 를 만들거나 수정할 때 (병합 전 빌드 확인)
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 # ----------------------------------------------------------
 # 워크플로 전체에서 쓰는 변수 (${{ env.이름 }} 으로 사용)
 # ----------------------------------------------------------
 env:
-  DOCKER_IMAGE: boot-flyway-web   # Docker Hub 저장소 이름 (소문자만 가능, 백엔드는 boot-flyway-app)
-  DOCKER_TAG: v1                  # 버전 태그 (새 버전을 구분해 남기고 싶으면 v2, v3 ... 로 변경)
+  DOCKER_IMAGE: boot-flyway-web # Docker Hub 저장소 이름 (소문자만 가능, 백엔드는 boot-flyway-app)
+  DOCKER_TAG: v1 # 버전 태그 (새 버전을 구분해 남기고 싶으면 v2, v3 ... 로 변경)
 
 jobs:
   build:
@@ -50,7 +51,6 @@ jobs:
 
     # 순서대로 실행, 한 단계라도 실패하면 뒤 단계는 실행되지 않음
     steps:
-
       # 1. 저장소 코드를 가상 머신으로 내려받기 (git clone 과 같은 역할)
       #    - 이 단계가 없으면 package.json, Dockerfile, src 가 없어서 뒤 단계가 모두 실패
       - name: Checkout
@@ -63,7 +63,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
           cache: npm
 
       # 3. 빌드 확인 (JSX 문법 오류, import 경로 오류 등이 있으면 여기서 실패)
@@ -94,7 +94,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}   # Access Token 권장
+          password: ${{ secrets.DOCKER_PASSWORD }} # Access Token 권장
 
       # 6. Dockerfile 로 이미지를 빌드하고 Docker Hub 에 push
       #    - Dockerfile 은 멀티 스테이지: node:22-alpine 으로 npm run build → nginx:alpine 이 dist 제공
